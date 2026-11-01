@@ -3,50 +3,53 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-
+    <!-- Search engine description -->
     <meta
       name="description"
       content="ENEMIND brings together practical knowledge, learning resources, digital opportunities and useful tools to help you learn, earn and live better."
     />
 
+    <!-- ENEMIND branding -->
     <meta name="theme-color" content="#102746" />
     <meta name="application-name" content="ENEMIND" />
 
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Mobile application support -->
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="ENEMIND" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
+    <!-- Page title -->
     <title>ENEMIND — Learn. Earn. Live Better.</title>
 
-    <!-- ENEMIND favicon -->
+    <!-- ENEMIND app icon -->
     <link
       rel="icon"
       type="image/png"
       href="/enemind-pwa/ENEMIND%20Learning%20App%20Icon.png"
     />
 
-    <!-- Mobile home-screen icon -->
     <link
       rel="apple-touch-icon"
       href="/enemind-pwa/ENEMIND%20Learning%20App%20Icon.png"
     />
 
-    <!-- PWA manifest, if present -->
+    <!-- Progressive Web App manifest -->
     <link
       rel="manifest"
       href="/enemind-pwa/manifest.webmanifest"
     />
+
+    <!-- Browser theme -->
+    <meta name="color-scheme" content="light" />
   </head>
 
   <body>
     <div id="root"></div>
 
-    <!-- React application entry point; Vite rewrites this during build -->
+    <!-- Vite transforms this into the production JavaScript bundle -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
