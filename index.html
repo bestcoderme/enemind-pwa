@@ -3,7 +3,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
 
     <meta
       name="description"
@@ -13,22 +17,36 @@
     <meta name="theme-color" content="#102746" />
     <meta name="application-name" content="ENEMIND" />
 
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="ENEMIND" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
     <title>ENEMIND — Learn. Earn. Live Better.</title>
 
+    <!-- ENEMIND favicon -->
     <link
       rel="icon"
       type="image/png"
-      href="%BASE_URL%ENEMIND%20Learning%20App%20Icon.png"
+      href="/enemind-pwa/ENEMIND%20Learning%20App%20Icon.png"
     />
 
+    <!-- Mobile home-screen icon -->
     <link
       rel="apple-touch-icon"
-      href="%BASE_URL%ENEMIND%20Learning%20App%20Icon.png"
+      href="/enemind-pwa/ENEMIND%20Learning%20App%20Icon.png"
+    />
+
+    <!-- PWA manifest, if present -->
+    <link
+      rel="manifest"
+      href="/enemind-pwa/manifest.webmanifest"
     />
   </head>
 
   <body>
     <div id="root"></div>
+
+    <!-- React application entry point; Vite rewrites this during build -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
