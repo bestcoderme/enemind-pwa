@@ -1,0 +1,3 @@
+[functions.enemind-admin]
+# Firebase ID tokens are not Supabase JWTs. The function verifies Firebase JWTs itself.
+verify_jwt = false
