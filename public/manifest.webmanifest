@@ -1,17 +1,15 @@
 {
-  "id": "./",
+  "id": "/enemind-pwa/",
   "name": "ENEMIND — Learn. Earn. Live Better.",
   "short_name": "ENEMIND",
-  "description": "Practical knowledge, learning resources, digital opportunities and useful tools to help you learn, earn and live better.",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/enemind-pwa/",
+  "scope": "/enemind-pwa/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#102746",
   "theme_color": "#102746",
   "icons": [
     {
-      "src": "enemind-icon.png",
+      "src": "/enemind-pwa/enemind-icon.png",
       "sizes": "any",
       "type": "image/png",
       "purpose": "any"
