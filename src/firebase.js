@@ -1,4 +1,6 @@
+
 import { initializeApp } from "firebase/app";
+
 import {
   getAuth,
   GoogleAuthProvider,
@@ -6,6 +8,7 @@ import {
   setPersistence,
 } from "firebase/auth";
 
+// Firebase configuration is supplied through Vite environment variables.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -15,17 +18,16 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
+// Identify missing or empty configuration values.
 const missingConfig = Object.entries(firebaseConfig)
-  .filter(([, value]) => !value)
+  .filter(([, value]) => typeof value !== "string" || !value.trim())
   .map(([key]) => key);
 
-// IMPORTANT: never throw at import time. A throw here stops the whole
-// bundle from running and leaves GitHub Pages showing a blank page.
-// Instead we export a readable error and let the UI display it.
+// Export a readable error instead of crashing the application at import time.
 export const firebaseConfigError =
   missingConfig.length > 0
-    ? `Missing Firebase configuration (${missingConfig.join(", ")}). ` +
-      `Add the VITE_FIREBASE_* values as GitHub repository secrets and redeploy.`
+    ? `Missing Firebase configuration: ${missingConfig.join(", ")}. ` +
+      "Check your GitHub repository secrets and deployment build."
     : "";
 
 let app = null;
@@ -36,17 +38,26 @@ let authReady = Promise.resolve();
 if (!firebaseConfigError) {
   try {
     app = initializeApp(firebaseConfig);
+
     auth = getAuth(app);
 
     googleProvider = new GoogleAuthProvider();
-    googleProvider.setCustomParameters({ prompt: "select_account" });
-
-    // Keep the user's login session between page refreshes.
-    authReady = setPersistence(auth, browserLocalPersistence).catch((err) => {
-      console.warn("ENEMIND could not set auth persistence:", err);
+    googleProvider.setCustomParameters({
+      prompt: "select_account",
     });
-  } catch (err) {
-    console.error("ENEMIND Firebase initialization failed:", err);
+
+    // Preserve the user's login session between page refreshes.
+    authReady = setPersistence(auth, browserLocalPersistence).catch(
+      (error) => {
+        console.warn(
+          "ENEMIND could not set Firebase authentication persistence:",
+          error
+        );
+      }
+    );
+  } catch (error) {
+    console.error("ENEMIND Firebase initialization failed:", error);
+
     app = null;
     auth = null;
     googleProvider = null;
@@ -54,4 +65,5 @@ if (!firebaseConfigError) {
 }
 
 export { auth, googleProvider, authReady };
+
 export default app;
