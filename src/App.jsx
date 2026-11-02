@@ -32,7 +32,7 @@ import {
   signOut,
 } from "firebase/auth";
 
-import { auth, googleProvider, authReady } from "./firebase";
+import { auth, googleProvider, authReady, firebaseConfigError } from "./firebase";
 import { getProducts, getCategories } from "./services/productService";
 import AdminDashboard from "./components/AdminDashboard";
 
@@ -88,6 +88,12 @@ function App() {
     let active = true;
 
     async function startAuthListener() {
+      if (!auth) {
+        setAuthError(firebaseConfigError || "Firebase could not initialize.");
+        setAuthLoading(false);
+        return;
+      }
+
       try {
         await authReady;
 
@@ -145,6 +151,11 @@ function App() {
 
   // Google popup sign-in
   const handleGoogleSignIn = async () => {
+    if (!auth || !googleProvider) {
+      setAuthError(firebaseConfigError || "Firebase is not available.");
+      return;
+    }
+
     try {
       setAuthLoading(true);
       setAuthError("");
@@ -203,7 +214,7 @@ function App() {
   const handleSignOut = async () => {
     try {
       setAuthError("");
-      await signOut(auth);
+      if (auth) await signOut(auth);
       setUser(null);
       setAdminView(false);
       console.log("ENEMIND signed out successfully.");

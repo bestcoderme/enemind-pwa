@@ -1,9 +1,14 @@
 
-import { supabase } from "../supabaseClient";
+import { supabase, supabaseConfigError } from "../supabaseClient";
+
+function requireClient() {
+  if (!supabase) throw new Error(supabaseConfigError);
+  return supabase;
+}
 
 // Fetch all published products for the public ENEMIND store
 export async function getProducts() {
-  const { data, error } = await supabase
+  const { data, error } = await requireClient()
     .from("products")
     .select(`
       *,
@@ -25,7 +30,7 @@ export async function getProducts() {
 
 // Fetch all active categories for the public ENEMIND store
 export async function getCategories() {
-  const { data, error } = await supabase
+  const { data, error } = await requireClient()
     .from("categories")
     .select("*")
     .eq("is_active", true)

@@ -13,7 +13,7 @@ export async function adminApi(action, options = {}) {
     throw new Error("Missing Supabase URL or publishable key in your .env file.");
   }
 
-  const currentUser = auth.currentUser;
+  const currentUser = auth?.currentUser;
   if (!currentUser) {
     throw new Error("Please sign in with your Google account again.");
   }
