@@ -1,3 +1,7 @@
 [functions.enemind-admin]
 # Firebase ID tokens are not Supabase JWTs. The function verifies Firebase JWTs itself.
 verify_jwt = false
+
+[functions.enemind-products]
+# Public read-only API for published products. No Supabase JWT required.
+verify_jwt = false

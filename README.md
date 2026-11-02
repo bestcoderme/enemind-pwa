@@ -13,3 +13,10 @@ React + Vite app deployed to GitHub Pages at `/enemind-pwa/`.
 
 ## Local development
 Copy `.env.example` to `.env`, fill in the values, then `npm install && npm run dev`.
+
+## Sharing products
+The product page has **Share product** (image + details + price + WhatsApp number via the phone's share sheet),
+**Share on WhatsApp**, **Copy details** and **Copy link**. Shared links (`?product=CODE`) open that product directly.
+
+## Products API for other apps
+See [API.md](./API.md). Deploy with `supabase functions deploy enemind-products --no-verify-jwt`.

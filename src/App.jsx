@@ -23,7 +23,7 @@ import {
   Copy,
   MessageCircle,
   ChevronLeft,
-  Image as ImageIcon,
+  Link2,
 } from "lucide-react";
 
 import {
@@ -35,10 +35,17 @@ import {
 import { auth, googleProvider, authReady, firebaseConfigError } from "./firebase";
 import { getProducts, getCategories } from "./services/productService";
 import AdminDashboard from "./components/AdminDashboard";
+import {
+  WHATSAPP_NUMBER,
+  productUrl,
+  whatsappOrderLink,
+  shareProduct as shareProductNative,
+  shareToWhatsApp,
+  copyProductDetails,
+} from "./shareUtils";
 
 import "./App.css";
 
-const WHATSAPP_NUMBER = "254180752220";
 const ADMIN_EMAIL = "joicebarasa7@gmail.com";
 
 const categoryDesign = [
@@ -69,6 +76,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [adminView, setAdminView] = useState(false);
+  const [toast, setToast] = useState("");
 
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -255,8 +263,7 @@ function App() {
           })
         );
 
-        setProducts(
-          productData.map((item) => ({
+        const mappedProducts = productData.map((item) => ({
             id: item.product_code,
             databaseId: item.id,
             title: item.title,
@@ -269,8 +276,22 @@ function App() {
             currency: item.currency || "KES",
             image: item.cover_image_url || "",
             badge: item.categories?.name || "ENEMIND resource",
-          }))
-        );
+          }));
+
+        setProducts(mappedProducts);
+
+        // Open a product directly from a shared link (?product=CODE)
+        const code = new URLSearchParams(window.location.search).get("product");
+        const match = code
+          ? mappedProducts.find((item) => item.id.toLowerCase() === code.toLowerCase())
+          : null;
+        if (match) {
+          setSelectedProduct(match);
+          window.setTimeout(
+            () => document.getElementById("store")?.scrollIntoView(),
+            150
+          );
+        }
 
         console.log("ENEMIND categories loaded:", categoryData.length);
         console.log("ENEMIND products loaded:", productData.length);
@@ -313,10 +334,10 @@ function App() {
     return matchesCategory && matchesSearch;
   });
 
-  const productUrl = (product) => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("product", product.id);
-    return url.toString();
+  const showToast = (message) => {
+    setToast(message);
+    window.clearTimeout(showToast.timer);
+    showToast.timer = window.setTimeout(() => setToast(""), 2600);
   };
 
   const orderProduct = (product) => {
@@ -327,86 +348,25 @@ Product ID: ${product.id}
 Price: ${product.currency} ${product.price}
 Product link: ${productUrl(product)}`;
 
-    window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,
-      "_blank",
-      "noopener,noreferrer"
-    );
+    window.open(whatsappOrderLink(message), "_blank", "noopener,noreferrer");
   };
 
-  const shareProduct = async (product) => {
-    const data = {
-      title: product.title,
-      text: `${product.description}\nPrice: ${product.currency} ${product.price}`,
-      url: productUrl(product),
-    };
-
-    try {
-      if (navigator.share) {
-        await navigator.share(data);
-      } else {
-        await navigator.clipboard.writeText(
-          `${data.text}\n${data.url}`
-        );
-        alert("Product details copied.");
-      }
-    } catch (err) {
-      if (err.name !== "AbortError") {
-        console.error("Sharing failed:", err);
-      }
-    }
+  const handleShare = async (product) => {
+    const result = await shareProductNative(product);
+    if (result === "copied") showToast("Product details copied.");
   };
 
-  const shareImage = async (product) => {
-    if (!product.image) {
-      alert("This product does not have an image yet.");
-      return;
-    }
-
-    try {
-      const response = await fetch(product.image);
-
-      if (!response.ok) {
-        throw new Error("Image could not be loaded.");
-      }
-
-      const blob = await response.blob();
-
-      const file = new File(
-        [blob],
-        `${product.id}-cover.jpg`,
-        { type: blob.type || "image/jpeg" }
-      );
-
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: product.title,
-        });
-      } else {
-        window.open(
-          product.image,
-          "_blank",
-          "noopener,noreferrer"
-        );
-      }
-    } catch (err) {
-      console.error("Image sharing error:", err);
-
-      window.open(
-        product.image,
-        "_blank",
-        "noopener,noreferrer"
-      );
-    }
+  const handleCopyDetails = async (product) => {
+    const ok = await copyProductDetails(product);
+    showToast(ok ? "Product details copied." : "Could not copy automatically.");
   };
 
   const copyProductLink = async (product) => {
     try {
       await navigator.clipboard.writeText(productUrl(product));
-      alert("Product link copied.");
+      showToast("Product link copied.");
     } catch {
-      alert("Unable to copy automatically. Please copy the page address.");
+      showToast("Could not copy automatically.");
     }
   };
 
@@ -754,19 +714,35 @@ Product link: ${productUrl(product)}`;
                       Order on WhatsApp
                     </button>
 
+                    <p className="share-note">
+                      Sharing includes the product image, price and our
+                      WhatsApp number ({`+${WHATSAPP_NUMBER}`}).
+                    </p>
+
                     <div className="share-actions">
-                      <button onClick={() => shareProduct(selectedProduct)}>
+                      <button
+                        className="share-main"
+                        onClick={() => handleShare(selectedProduct)}
+                      >
                         <Share2 size={17} />
                         Share product
                       </button>
-                      <button onClick={() => shareImage(selectedProduct)}>
-                        <ImageIcon size={17} />
-                        Share image
+                      <button
+                        onClick={() => shareToWhatsApp(selectedProduct)}
+                      >
+                        <MessageCircle size={17} />
+                        Share on WhatsApp
+                      </button>
+                      <button
+                        onClick={() => handleCopyDetails(selectedProduct)}
+                      >
+                        <Copy size={17} />
+                        Copy details
                       </button>
                       <button
                         onClick={() => copyProductLink(selectedProduct)}
                       >
-                        <Copy size={17} />
+                        <Link2 size={17} />
                         Copy link
                       </button>
                     </div>
@@ -874,6 +850,12 @@ Product link: ${productUrl(product)}`;
             </p>
           </section>
         </main>
+      )}
+
+      {toast && (
+        <div className="toast" role="status" aria-live="polite">
+          {toast}
+        </div>
       )}
 
       <footer className="footer">
